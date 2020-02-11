@@ -29,6 +29,7 @@ pipeline {
       stage('Package') {
         when {
                 branch 'master'
+                changeset pattern: "java/cmad-ms-users/*"
             }
          steps {
             echo 'Packaging...'
