@@ -1,0 +1,41 @@
+pipeline {
+   agent any
+
+   tools {
+       maven 'Maven_3.6.1'
+   }
+
+   stages {
+      stage('Build') {
+        when { 
+                changeset pattern: "java/cmad-ms-users/**"
+            }
+         steps {
+            echo 'Building...'
+            dir('java/cmad-ms-users'){
+                sh 'mvn compile'
+            }
+         }
+      }
+      stage('Test') {
+          when { 
+                changeset pattern: "java/cmad-ms-users/**"
+            }
+         steps {
+            echo 'Testing...'
+            sh 'mvn -f java/cmad-ms-users/pom.xml clean test'
+         }
+      }
+      stage('Package') {
+        when {
+                branch 'master'
+                changeset pattern: "java/cmad-ms-users/**"
+            }
+         steps {
+            echo 'Packaging...'
+            sh 'mvn -f java/cmad-ms-users/pom.xml package -DskipTests'
+            archiveArtifacts artifacts: 'java/cmad-ms-users/target/*.jar', fingerprint: true
+         }
+      }
+   }
+}
