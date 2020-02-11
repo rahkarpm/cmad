@@ -7,6 +7,9 @@ pipeline {
 
    stages {
       stage('Build') {
+        when { 
+                changeset pattern: "java/cmadms-users/*"
+            }
          steps {
             echo 'Building...'
             dir('java/cmad-ms-users'){
@@ -15,12 +18,18 @@ pipeline {
          }
       }
       stage('Test') {
+          when { 
+                changeset pattern: "java/cmadms-users/*"
+            }
          steps {
             echo 'Testing...'
             sh 'mvn -f java/cmad-ms-users/pom.xml clean test'
          }
       }
       stage('Package') {
+        when {
+                branch 'master'
+            }
          steps {
             echo 'Packaging...'
             sh 'mvn -f java/cmad-ms-users/pom.xml package -DskipTests'
