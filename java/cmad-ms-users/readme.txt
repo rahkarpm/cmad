@@ -8,5 +8,4 @@ java -jar cmad-user-service.jar
 {"uid":"admin", "devices":["192.04.93.122", "192.165.3.12"]}
 to http://localhost:8081/user
 
-Test
 Remember the uid and devices.
