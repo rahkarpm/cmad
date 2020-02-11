@@ -8,7 +8,7 @@ pipeline {
    stages {
       stage('Build') {
         when { 
-                changeset pattern: "java/cmadms-users/*"
+                changeset pattern: "java/cmad-ms-users/*"
             }
          steps {
             echo 'Building...'
@@ -19,7 +19,7 @@ pipeline {
       }
       stage('Test') {
           when { 
-                changeset pattern: "java/cmadms-users/*"
+                changeset pattern: "java/cmad-ms-users/*"
             }
          steps {
             echo 'Testing...'
