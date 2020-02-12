@@ -1,40 +1,60 @@
 pipeline {
-   agent {
-       docker { image 'maven:3.6.1-jdk-8-slim'
-                args '-v $HOME/.m2:/root/.m2' }
-   }
+   agent none
 
    stages {
-      stage('Build') {
+        stage('Build') {
+        agent {
+            docker { image 'maven:3.6.1-jdk-8-slim'
+                        args '-v $HOME/.m2:/root/.m2' }
+        }
         when { 
                 changeset pattern: "java/cmad-ms-users/**"
             }
-         steps {
+            steps {
             echo 'Building...'
             dir('java/cmad-ms-users'){
                 sh 'mvn compile'
             }
-         }
-      }
-      stage('Test') {
-          when { 
+            }
+        }
+        stage('Test') {
+            agent {
+            docker { image 'maven:3.6.1-jdk-8-slim'
+                        args '-v $HOME/.m2:/root/.m2' }
+            }
+            when { 
                 changeset pattern: "java/cmad-ms-users/**"
             }
-         steps {
+            steps {
             echo 'Testing...'
             sh 'mvn -f java/cmad-ms-users/pom.xml clean test'
-         }
-      }
-      stage('Package') {
-        when {
+            }
+        }
+        stage('Package') {
+            agent {
+            docker { image 'maven:3.6.1-jdk-8-slim'
+                        args '-v $HOME/.m2:/root/.m2' }
+            }
+            when {
                 branch 'master'
                 changeset pattern: "java/cmad-ms-users/**"
             }
-         steps {
+            steps {
             echo 'Packaging...'
             sh 'mvn -f java/cmad-ms-users/pom.xml package -DskipTests'
             archiveArtifacts artifacts: 'java/cmad-ms-users/target/*.jar', fingerprint: true
-         }
-      }
-   }
+            }
+        }
+        stage('docker-package'){
+            agent any
+            steps{
+                echo 'Packaging users app with docker'
+                script{
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
+                        def usersImage = docker.build("xxxx/users:v${env.BUILD_ID}", "./users")
+                    } 
+                }
+            }
+        }
+    }
 }
